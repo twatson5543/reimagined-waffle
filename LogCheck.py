@@ -20,12 +20,14 @@ class f1:
         return flist_4
     # //// List Files in Directory that are log_ files.
     def FileList(Dirpath):
-        list1 = os.listdir(Dirpath)
+        list1 = sorted(os.listdir(Dirpath))
+        print(list1)
         list2 = []
         for i in list1:
             if (i.find("log_") != -1):
                 list2.append(i)
         return list2
+# End f1
 
 
 class f2:
@@ -58,6 +60,8 @@ class f2:
             ilist.append(nlist)
         #print(ilist)
         return ilist
+# End f2
+
 
 class f3:
     def calcNetTime(oglist):
@@ -70,14 +74,38 @@ class f3:
                     DailyTrueList.append(True)
                 else:
                     DailyTrueList.append(False)
-            print(DailyTrueList)
-            FalseCount = "Number of Minutes Offline: " + str(DailyTrueList.count(False))
+            #print(DailyTrueList)
+            FalseCount = str(DailyTrueList.count(False))
             FullList.append(FalseCount)
-        for i in FullList:
-            print(i)
         return FullList
-        
+    def DateLogList(list):
+        DateList = []
+        for i in list:
+            i2 = i.replace("log_","")
+            i3 = i2.replace(".txt","")
+            DateList.append(i3)
+        print(DateList)
+        return DateList
+    def WriteLogList(lista, listb):
+        WriteList = []
+        for a,b in zip(lista,listb):
+            compiled_list = "<LogDate=" + b + "/><NumOfMinutesDown=" + a + "/>"
+            print(compiled_list)
+            WriteList.append(compiled_list)
+        return WriteList
+# End f3
 
+
+class f4:
+    def WriteToFile(list):
+        file = open('InternetDailyLogs.txt','w')
+        for i in list:
+            file.writelines(i + '\n')
+        file.close()
+# End f4
+
+
+# ========== Main Run ==========
 # // Get Log Files
 absFilepath = f1.FileDir()
 absDirPath = f1.FileDirParse(absFilepath)
@@ -87,4 +115,10 @@ LogFileList = f1.FileList(absDirPath)
 FileContentList = f2.GetListText(LogFileList)
 ParsedContentList = f2.ListParse(FileContentList)
 
+# // Get daily logs of Minutes Down
 MinutesOffline = f3.calcNetTime(ParsedContentList)
+LogDateList = f3.DateLogList(LogFileList)
+WriteList = f3.WriteLogList(MinutesOffline,LogDateList)
+
+# // Write Final Logs to file
+f4.WriteToFile(WriteList)
